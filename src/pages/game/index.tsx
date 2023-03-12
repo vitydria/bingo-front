@@ -1,6 +1,7 @@
+//next
 import { NextPage } from "next";
 //components
-import { Board } from "../../../components/Board/Board";
+import { Board } from "@/components/Board/Board";
 //styles
 import styles from '../../styles/Game.module.css'
 
