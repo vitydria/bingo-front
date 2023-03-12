@@ -1,0 +1,15 @@
+.title {
+    text-transform: capitalize;
+    color: #FFD645;
+    text-shadow: 1.8px 1.8px #ffffff;
+    font-size: 154px;
+    line-height: 169px;
+    align-self: center;
+    justify-self: center;
+}
+
+.main {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: repeat(3, 1fr);
+}

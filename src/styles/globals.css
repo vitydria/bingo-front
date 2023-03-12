@@ -105,3 +105,8 @@ a {
     color-scheme: dark;
   }
 }
+
+@font-face {
+  font-family: Magilio;
+  src: url(../../public/fonts/MagilioRegular-8Mxvg.otf);
+}
