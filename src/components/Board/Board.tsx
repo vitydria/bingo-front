@@ -12,7 +12,7 @@ export const Board: FC = () => {
   return (
     <div className={styles.board}>
       {
-        board.map((row) => row.map((value) => <Cell value={value}/>))
+        board.map((row, boardIndex) => row.map((value, rowIndex) => <Cell value={value} key={ value } />))
       }
     </div>
   )
