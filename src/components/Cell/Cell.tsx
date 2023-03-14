@@ -8,5 +8,4 @@ interface Props {
 
 export const Cell:FC<Props> = ({ value }) => {
     return <div className={styles.cell}>{value}</div>
-    
 }
