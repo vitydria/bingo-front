@@ -27,7 +27,7 @@ export default function Home() {
         <h2 className={styles.text}>start game</h2>
         <div className={styles.form}>
           <Input label="Put your name" type="text" />
-          <button onClick={handleScreen}></button>   
+          <button onClick={handleScreen} className={styles.button}>start</button>   
         </div>
       </main>
     </>
