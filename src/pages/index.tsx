@@ -1,18 +1,79 @@
-import Head from 'next/head'
+import Head from "next/head";
 //hooks
-import { useRouter } from 'next/router'
+import { useRouter } from "next/router";
 //components
-import { Input } from '@/components/Input/Input'
+import { Input } from "@/components/Input/Input";
 //styles
-import styles from '@/styles/Home.module.css'
+import styles from "@/styles/Home.module.css";
+import { useEffect, useState } from "react";
+import { Manager, Socket } from "socket.io-client";
+import {
+  addListeners,
+  emitSavePlayerMessage,
+  emitGameModeMessage,
+} from "@/utils/listeners";
+import GameMode from "@/components/GameMode";
+
+const url = "localhost:3000/socket.io/socket.io.js";
 
 export default function Home() {
-
   const router = useRouter();
+  const [socket, setSocket] = useState<Socket | any>();
+  const [socketConnected, setSocketConnected] = useState<boolean>(false);
+  const [clientsConnected, setClientsConnected] = useState<number>(0);
+
+  const [playerName, setPlayerName] = useState<string>("");
+
+  const [isSavedPlayer, setIsSavedPlayer] = useState(false);
+
+  const [openGameMode, setOpenGameMode] = useState({
+    isSaved: false,
+    mode: "",
+  });
 
   const handleScreen = () => {
-    router.push('/game')
-  }
+    router.push("/game");
+  };
+
+  const handleSocket = () => {
+    const managet = new Manager(url);
+
+    const socket = managet.socket("/");
+
+    setSocket(socket);
+
+    addListeners(socket, (data: any) => {
+      console.log(data);
+
+      if (data.type === "socket-connection") {
+        setSocketConnected(data.isSocketConnected);
+        setClientsConnected(data.clientsNumber);
+      }
+
+      if (data.type === "saved-player") {
+        setIsSavedPlayer(data.isSaved);
+      }
+
+      if (data.type === "saved-game-mode") {
+        setOpenGameMode({
+          mode: data.mode,
+          isSaved: data.isSaved,
+        });
+      }
+    });
+  };
+
+  const handlePlayerName = (name: string) => {
+    emitSavePlayerMessage(socket, name);
+  };
+
+  const handleMode = (mode: string) => {
+    emitGameModeMessage(socket, mode);
+  };
+
+  useEffect(() => {
+    handleSocket();
+  }, []);
 
   return (
     <>
@@ -23,13 +84,47 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <h1 className={styles.title}>bingo</h1>
-        <h2 className={styles.text}>start game</h2>
-        <div className={styles.form}>
-          <Input label="Put your name" type="text" />
-          <button onClick={handleScreen} className={styles.button}>start</button>   
-        </div>
+        <h3 className={styles.users_connected_text}>
+          users connected: {clientsConnected}{" "}
+        </h3>
+        {!isSavedPlayer && (
+          <>
+            <h1 className={styles.title}>bingo</h1>
+
+            <h2 className={styles.text}>start game</h2>
+            <div className={styles.form}>
+              {socketConnected ? (
+                <>
+                  <Input
+                    label="Put your name"
+                    type="text"
+                    onChange={(e: string) => setPlayerName(e)}
+                  />
+                  <button
+                    onClick={() => handlePlayerName(playerName)}
+                    className={styles.button}
+                    disabled={!playerName}
+                  >
+                    start
+                  </button>
+                </>
+              ) : (
+                <>
+                  <h2 className={styles.text}>No server connected</h2>
+                </>
+              )}
+            </div>
+          </>
+        )}
+
+        {isSavedPlayer && (
+          <GameMode
+            socket={socket}
+            playerName={playerName}
+            handleMode={handleMode}
+          />
+        )}
       </main>
     </>
-  )
+  );
 }
