@@ -14,9 +14,8 @@ export const addListeners = (socket: Socket, callBack: Function) => {
 
   // guardar jugador
   socket.on("save-player", (e: any) => {
-    console.log(e);
-
-    callBack({ isSaved: true, type: "saved-player" });
+    const { isHost } = e;
+    callBack({ isSaved: true, type: "saved-player", isHost });
   });
 
   // guardar modo de juego
@@ -27,7 +26,8 @@ export const addListeners = (socket: Socket, callBack: Function) => {
 
   //ver tabla asignada
   socket.on("create-table", (e: any) => {
-    console.log(e);
+    console.log("my fuckin table: ", e);
+    callBack({ isSaved: true, type: "create-table", table: e.table.table });
   });
 
   // desconectar usuario
