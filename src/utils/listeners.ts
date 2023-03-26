@@ -14,21 +14,26 @@ export const addListeners = (socket: Socket, callBack: Function) => {
 
   // guardar jugador
   socket.on("save-player", (e: any) => {
-    const { isHost } = e;
-    callBack({ isSaved: true, type: "saved-player", isHost });
+    callBack({ isSaved: true, type: "saved-player" });
   });
 
   // guardar modo de juego
   socket.on("save-game-mode", (e: any) => {
     console.log(e);
-    callBack({ isSaved: true, type: "saved-game-mode", mode: e.gameMode });
+    callBack({ isSaved: true, type: "saved-game-mode", mode: e.gameMode, table: e.table.table });
   });
 
+  socket.on('randomBall', (randomNumber) => {
+  callBack({randomBall: randomNumber})
+})
+
+  //obtener tabla
+
   //ver tabla asignada
-  socket.on("create-table", (e: any) => {
-    console.log("my fuckin table: ", e);
-    callBack({ isSaved: true, type: "create-table", table: e.table.table });
-  });
+  // socket.on("create-table", (e: any) => {
+  //   console.log("my fuckin table: ", e);
+  //   callBack({ isSaved: true, type: "create-table", table: e.table.table });
+  // });
 
   // desconectar usuario
   socket.on("disconnect", (e: any) => {
@@ -71,3 +76,15 @@ export const emitGameModeMessage = (socket: Socket, mode: string) => {
     isGameMode: true,
   });
 };
+
+export const emitBoard = (socket: Socket) => {
+  socket.emit("message-from-client"), {
+    isCreatedTable: true
+  };
+};
+
+export const emitRandomBall = (socket: Socket) => {
+  socket.emit("message-from-client"), {
+    isGameStarted: true
+  };
+}

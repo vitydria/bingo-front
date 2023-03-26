@@ -8,6 +8,8 @@ import {
   addListeners,
   emitSavePlayerMessage,
   emitGameModeMessage,
+  emitBoard,
+  emitRandomBall,
 } from "@/utils/listeners";
 
 const SocketProvider = ({ children }: any) => {
@@ -15,7 +17,7 @@ const SocketProvider = ({ children }: any) => {
   const [socket, setSocket] = useState<Socket | any>();
   const [socketConnected, setSocketConnected] = useState<boolean>(false);
   const [clientsConnected, setClientsConnected] = useState<number>(0);
-
+  const [randomBall, setRandomBall] = useState<number>(0);
   const [playerName, setPlayerName] = useState<string>("");
 
   const [isSavedPlayer, setIsSavedPlayer] = useState(false);
@@ -54,29 +56,31 @@ const SocketProvider = ({ children }: any) => {
           mode: data.mode,
           isSaved: data.isSaved,
         });
-      }
 
-      if (data.type === "create-table") {
-        console.log("datasssssss: ", data)
         setBoard(prevState => [...prevState, ...data.table])
       }
-    });
-    
+
+      if (data.randomBall) {
+        setRandomBall(data.randomBall.ball)
+      }
+    }); 
   };
 
-  useEffect(() => {
-    console.log(board);
-  }, [board])
-  
-
+  useEffect(() => { 
+    handleSocket();
+  }, []);
+    
   const handlePlayerName = (name: string) => {
-    console.log("socket: ", socket)
     emitSavePlayerMessage(socket, name);
   };
 
   const handleMode = (mode: string) => {
     emitGameModeMessage(socket, mode);
   };
+
+  const handleBoard = (socket: Socket) => {
+    emitBoard(socket);
+  }
 
   const context:any = {
     handleSocket,
@@ -89,7 +93,9 @@ const SocketProvider = ({ children }: any) => {
     isSavedPlayer,
     isHost,
     openGameMode,
-    board
+    board,
+    handleBoard,
+    randomBall
   };
 
   return (

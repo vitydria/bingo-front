@@ -8,37 +8,23 @@ import styles from "@/styles/Home.module.css";
 import { useContext, useEffect } from "react";
 import GameMode from "@/components/GameMode";
 import SocketContext from "@/context/SocketContext";
+import { Board } from "@/components/Board/Board";
 
 const url = "localhost:3000/socket.io/socket.io.js";
 
 export default function Home() {
 
   const context = useContext(SocketContext)
-  const { push } = useRouter();
-  const { handleSocket,
-    openGameMode,
+  const { 
     clientsConnected,
     isSavedPlayer,
     socketConnected,
     setPlayerName,
     handlePlayerName,
     playerName, 
-    isHost,
     socket,
-    handleMode } = context;
-  
-  const handleScreen = () => {
-    push('/game');
-  }
-  
-    useEffect(() => { 
-      handleSocket();
-    }, []);
-    
-    useEffect(() => {
-      if(openGameMode.isSaved)
-      handleScreen();
-    }, [openGameMode.isSaved])
+    handleMode,
+    board } = context; 
   
   return (
     <>
@@ -82,15 +68,16 @@ export default function Home() {
           </>
         )}
 
-        {(isSavedPlayer && isHost) && (
+        {(isSavedPlayer && !board.length) && (
           <GameMode
             socket={socket}
             playerName={playerName}
             handleMode={handleMode}
           />
         )}
-        {(isSavedPlayer && !isHost) && (
-          <h1 className={styles.text}>Waiting for host...</h1>
+
+        {(board.length > 0) && (
+           <Board />
         )}
       </main>
     </>
