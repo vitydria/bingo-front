@@ -1,6 +1,9 @@
 import { Socket } from "socket.io-client";
 
 export const addListeners = (socket: Socket, callBack: Function) => {
+
+
+
   //ver clientes conectados
   socket.on("clients-connected", (e: any) => {
     console.log(e);
@@ -12,20 +15,49 @@ export const addListeners = (socket: Socket, callBack: Function) => {
     });
   });
 
+  socket.on('joined-game',()=> {
+    callBack({  type: "joined-game" });
+  })
+
+
+  socket.on('lobby-closed',(payload)=> {
+    callBack({  mode:payload.mode,type: "lobby-closed" });
+  })
+
+
+  socket.on('game-has-started',()=> {
+    callBack({  type: "game-has-started" });
+  })
+
+  socket.on('game-already-on',()=> {
+    callBack({  type: "game-already-on" });
+  })
+
   // guardar jugador
   socket.on("save-player", (e: any) => {
     callBack({ isSaved: true, type: "saved-player" });
   });
 
-  // guardar modo de juego
-  socket.on("save-game-mode", (e: any) => {
-    console.log(e);
-    callBack({ isSaved: true, type: "saved-game-mode", mode: e.gameMode, table: e.table.table });
+  socket.on("win-announced", (payload) => {
+    callBack({  type: "win-announced" });
   });
 
-  socket.on('randomBall', (randomNumber) => {
-  callBack({randomBall: randomNumber})
-})
+  // guardar modo de juego
+
+  socket.on("table-assigned", (e: any) => {
+    callBack({
+      isSaved: true,
+      type: "saved-game-mode",
+      mode: e.gameMode,
+      table: e.table,
+    });
+  });
+
+
+
+  socket.on("num-announced", (payload) => {
+    callBack({ randomBall: { ball: payload.number } });
+  });
 
   //obtener tabla
 
@@ -78,13 +110,15 @@ export const emitGameModeMessage = (socket: Socket, mode: string) => {
 };
 
 export const emitBoard = (socket: Socket) => {
-  socket.emit("message-from-client"), {
-    isCreatedTable: true
-  };
+  socket.emit("message-from-client"),
+    {
+      isCreatedTable: true,
+    };
 };
 
 export const emitRandomBall = (socket: Socket) => {
-  socket.emit("message-from-client"), {
-    isGameStarted: true
-  };
-}
+  socket.emit("message-from-client"),
+    {
+      isGameStarted: true,
+    };
+};

@@ -28,21 +28,9 @@ export default function GameMode({ handleMode, playerName }: GameModeProps) {
       <main className={styles.main}>
         <h1 className={styles.title}>bingo</h1>
         <h2 className={styles.text}>Hi {playerName}</h2>
-        <h2 className={styles.text}>Select Game mode</h2>
-        <div className={styles.form}>
-          <button
-            className={styles.game_mode_buttons}
-            onClick={() => handleMode("NORMAL")}
-          >
-            Normal
-          </button>
-          <button
-            className={styles.game_mode_buttons}
-            onClick={() => handleMode("FULL")}
-          >
-            Full Board
-          </button>
-        </div>
+        <h2 className={styles.text}>The game will shortly start after the lobby gets enough players</h2>
+
+        
       </main>
     </>
   );

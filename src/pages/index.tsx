@@ -5,27 +5,35 @@ import { useRouter } from "next/router";
 import { Input } from "@/components/Input/Input";
 //styles
 import styles from "@/styles/Home.module.css";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import GameMode from "@/components/GameMode";
 import SocketContext from "@/context/SocketContext";
 import { Board } from "@/components/Board/Board";
 
-const url = "localhost:3000/socket.io/socket.io.js";
-
 export default function Home() {
-
-  const context = useContext(SocketContext)
-  const { 
+  const context = useContext(SocketContext);
+  const {
     clientsConnected,
     isSavedPlayer,
     socketConnected,
     setPlayerName,
     handlePlayerName,
-    playerName, 
+    playerName,
     socket,
     handleMode,
-    board } = context; 
-  
+    gameAlreadyOn,
+    board,
+    gameHasStarted,
+  } = context;
+
+  const [msg, setMsg] = useState<string | null>(null);
+  const [tableAnswered, setTableAnswered] = useState<boolean>(false);
+
+  const sa = {
+    fontSize: "1.2em",
+    fontFamily: "Open Sans, sans-serif",
+  };
+
   return (
     <>
       <Head>
@@ -36,13 +44,18 @@ export default function Home() {
       </Head>
       <main className={styles.main}>
         <h3 className={styles.users_connected_text}>
-          users connected: {clientsConnected}{" "}
+          users connected: {clientsConnected}
         </h3>
         {!isSavedPlayer && (
           <>
             <h1 className={styles.title}>bingo</h1>
 
             <h2 className={styles.text}>start game</h2>
+            {gameAlreadyOn && (
+              <p style={sa}>
+                Actualmente hay un juego en progrese espere unos minutos
+              </p>
+            )}
             <div className={styles.form}>
               {socketConnected ? (
                 <>
@@ -65,10 +78,52 @@ export default function Home() {
                 </>
               )}
             </div>
+
+            <h2 className={styles.text}>Select Game mode</h2>
+            <div className={styles.form}>
+              <button
+                className={styles.game_mode_buttons}
+                onClick={() => {
+                  setMsg("NORMAL");
+                  if (socket) {
+                    socket.emit("set-mode", {
+                      mode: "NORMAL",
+                    });
+                  }
+                }}
+              >
+                Normal
+              </button>
+              <button
+                className={styles.game_mode_buttons}
+                onClick={() => {
+                  setMsg("FULL");
+                  if (socket) {
+                    socket.emit("set-mode", {
+                      mode: "FULL",
+                    });
+                  }
+                }}
+              >
+                Full Board
+              </button>
+            </div>
           </>
         )}
 
-        {(isSavedPlayer && !board.length) && (
+        {board.length != 0 && !gameHasStarted && (
+          <p style={sa}>
+            The game will start when all the players accept their table
+          </p>
+        )}
+
+        {board.length == 0 && msg && !isSavedPlayer && (
+          <p style={sa}>
+            the next time that i game starts it will be set to : {msg}
+          </p>
+        )}
+
+        {isSavedPlayer && !board.length && (
           <GameMode
             socket={socket}
             playerName={playerName}
@@ -76,9 +131,31 @@ export default function Home() {
           />
         )}
 
-        {(board.length > 0) && (
-           <Board />
+        {board.length != 0 && !gameHasStarted && !tableAnswered && (
+          <>
+            <button
+              onClick={() => {
+                if (socket) {
+                  socket.emit("answer-table", { accept: true });
+                }
+                setTableAnswered(true);
+              }}
+            >
+              Accept Table
+            </button>
+            <button
+              onClick={() => {
+                if (socket) {
+                  socket.emit("answer-table", { accept: false });
+                }
+              }}
+            >
+              Reject Table
+            </button>
+          </>
         )}
+
+        {board.length > 0 && <Board />}
       </main>
     </>
   );

@@ -7,11 +7,10 @@ import SocketContext from "@/context/SocketContext";
 import styles from "./Board.module.css";
 
 export const Board: FC = () => {
-
   const context = useContext(SocketContext);
   const { board, randomBall } = context;
   const [letter, setLetter] = useState("");
-  
+
   const ballLetter = () => {
     if (randomBall > 0 && randomBall <= 15) {
       setLetter("B");
@@ -28,21 +27,42 @@ export const Board: FC = () => {
     if (randomBall > 60 && randomBall <= 75) {
       setLetter("O");
     }
-  }
+  };
 
   useEffect(() => {
     ballLetter();
-  }, [randomBall])
-  
+  }, [randomBall]);
+
   return (
-    <div className={styles.board}>
-      {
-        board?.map((row, boardIndex) => row.map((value, rowIndex) => <Cell value={value} key={ value } />))
+    <div>
+      <div className={styles.board}>
+        <Cell value={"B"} />
+        <Cell value={"I"} />
+        <Cell value={"N"} />
+        <Cell value={"G"} />
+        <Cell value={"O"} />
+        {board?.map((row, boardIndex) =>
+          row.map((value, rowIndex) => (
+            <Cell
+              value={value}
+              key={value}
+              mark={context.numbersGenerated.includes(value)}
+            />
+          ))
+        )}
+        {randomBall > 0 && letter && (
+          <h1>
+            {letter} {randomBall}
+          </h1>
+        )}
+      </div>
+      {context.winner &&
+        <div>
+          <p> El juego termino ya que alguien gano </p>
+          <button onClick={()=>window.location.reload()} > Volver a jugar </button>
+        </div>
+      
       }
-      {(randomBall > 0 && letter) && (
-        <h1> {letter} { randomBall }</h1>  
-      )
-    }
     </div>
-  )
-}
+  );
+};
