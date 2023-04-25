@@ -46,7 +46,8 @@ const SocketProvider = ({ children }: any) => {
   const [clientsConnected, setClientsConnected] = useState<number>(0);
   const [randomBall, setRandomBall] = useState<number>(0);
   const [playerName, setPlayerName] = useState<string>("");
-  const [winner,setWinner] = useState<Boolean | null>(null)
+  const [winner, setWinner] = useState<Boolean | null>(null)
+  const [winnerName, setWinnerName] = useState("")
   const [gameAlreadyOn,setGameAlreadyOn] = useState(false)
   const [gameHasStarted,setGameHasStarted] = useState(false)
 
@@ -64,7 +65,7 @@ const SocketProvider = ({ children }: any) => {
 
   const [board, setBoard] = useState<any[]>([]);
 
-  const url = "http://201.208.159.77/socket.io/socket.io.js";
+  const url = "http://localhost:3000";
 
   const handleSocket = () => {
     if(!socket) {
@@ -81,7 +82,8 @@ const SocketProvider = ({ children }: any) => {
 
     addListeners(socket, (data: any) => {
       
-      if( data.type === 'win-announced' ) {
+      if (data.type === 'win-announced') {
+        setWinnerName(data.payload.winner.name)
         setWinner(true)
       }
 
@@ -180,6 +182,7 @@ const SocketProvider = ({ children }: any) => {
     handleSocket,
     playerName,
     setPlayerName,
+    winnerName,
     handlePlayerName,
     handleMode,
     socketConnected,

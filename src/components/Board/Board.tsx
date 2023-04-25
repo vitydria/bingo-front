@@ -32,9 +32,10 @@ export const Board: FC = () => {
   useEffect(() => {
     ballLetter();
   }, [randomBall]);
-
+  
   return (
     <div>
+      <p>Player: {context.playerName}</p>
       <div className={styles.board}>
         <Cell value={"B"} />
         <Cell value={"I"} />
@@ -58,7 +59,7 @@ export const Board: FC = () => {
       </div>
       {context.winner &&
         <div>
-          <p> El juego termino ya que alguien gano </p>
+          <p> El juego termino ya que alguien gano: {context.winnerName} </p>
           <button onClick={()=>window.location.reload()} > Volver a jugar </button>
         </div>
       

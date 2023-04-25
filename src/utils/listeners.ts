@@ -39,7 +39,7 @@ export const addListeners = (socket: Socket, callBack: Function) => {
   });
 
   socket.on("win-announced", (payload) => {
-    callBack({  type: "win-announced" });
+    callBack({  payload, type: "win-announced" });
   });
 
   // guardar modo de juego
